@@ -146,7 +146,8 @@ class ActionDispatcher {
 
     _keyPressEvent(actor, event) {
         if (!this._modifierMask) {
-            this._modifierMask = getModLock(event.get_state());
+            this._modifierMask = getModLock(event.get_state())
+            this.mode |= Clutter.GrabState.KEYBOARD
         }
         let keysym = event.get_key_symbol();
         let action = global.display.get_keybinding_action(event.get_key_code(), event.get_state());
