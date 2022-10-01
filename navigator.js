@@ -148,6 +148,7 @@ function getModLock(mods) {
     _keyPressEvent(actor, event) {
         if (!this._modifierMask) {
             this._modifierMask = getModLock(event.get_state())
+            this.mode |= Clutter.GrabState.KEYBOARD
         }
         let keysym = event.get_key_symbol();
 
