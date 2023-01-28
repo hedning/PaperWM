@@ -268,8 +268,7 @@ var Space = class Space extends Array {
         this.clip.show();
         for (let col of this) {
             for (let w of col) {
-                let actor = w.get_compositor_private();
-                w.clone.cloneActor.source = actor;
+                addClone(w)
             }
         }
     }
@@ -281,7 +280,7 @@ var Space = class Space extends Array {
         this.clip.hide();
         for (let col of this)
             for (let w of col)
-                w.clone.cloneActor.source = null;
+                removeClone(w)
     }
 
     workArea() {
@@ -2267,6 +2266,33 @@ function is_override_redirect(metaWindow) {
     );
 }
 
+function addClone(metaWindow) {
+    if (metaWindow.clone.cloneActor) {
+        return
+    }
+    const actor = metaWindow.get_compositor_private()
+    let cloneActor = new Clutter.Clone({ source: actor });
+    metaWindow.clone.add_actor(cloneActor)
+    metaWindow.clone.cloneActor = cloneActor
+    let frame = metaWindow.get_frame_rect();
+    let buffer = metaWindow.get_buffer_rect();
+    // Adjust the clone's origin to the north-west, so it will line up
+    // with the frame.
+    let clone = metaWindow.clone;
+    cloneActor.set_position(buffer.x - frame.x,
+        buffer.y - frame.y);
+    cloneActor.set_size(buffer.width, buffer.height);
+    clone.set_size(frame.width, frame.height);
+
+}
+
+function removeClone(metaWindow) {
+    if (metaWindow.clone.cloneActor) {
+        metaWindow.clone.cloneActor.destroy()
+        metaWindow.clone.cloneActor = null
+    }
+}
+
 function registerWindow(metaWindow) {
     if (is_override_redirect(metaWindow)) {
         return false;
@@ -2971,8 +2997,9 @@ function showWindow(metaWindow) {
     let actor = metaWindow.get_compositor_private();
     if (!actor)
         return false;
-    metaWindow.clone.cloneActor.hide();
-    metaWindow.clone.cloneActor.source = null;
+    removeClone(metaWindow)
+    // metaWindow.clone.cloneActor.hide();
+    // metaWindow.clone.cloneActor.source = null;
     actor.show();
     return true;
 }
@@ -2981,15 +3008,15 @@ function animateWindow(metaWindow) {
     let actor = metaWindow.get_compositor_private();
     if (!actor)
         return false;
+    addClone(metaWindow)
     metaWindow.clone.cloneActor.show();
-    metaWindow.clone.cloneActor.source = actor;
     actor.hide();
     return true;
 }
 
 function isWindowAnimating(metaWindow) {
     let clone = metaWindow.clone;
-    return clone.get_parent() && clone.cloneActor.visible;
+    return clone.get_parent() && clone.cloneActor && clone.cloneActor.visible;
 }
 
 function toggleMaximizeHorizontally(metaWindow) {
