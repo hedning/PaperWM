@@ -2336,20 +2336,20 @@ function allocateClone(metaWindow) {
     // with the frame.
     let clone = metaWindow.clone;
     let cloneActor = clone.cloneActor;
-    cloneActor.set_position(buffer.x - frame.x,
-                       buffer.y - frame.y);
-    cloneActor.set_size(buffer.width, buffer.height);
+    if (cloneActor) {
+        cloneActor.set_position(buffer.x - frame.x, buffer.y - frame.y);
+        cloneActor.set_size(buffer.width, buffer.height);
+    }
     clone.set_size(frame.width, frame.height);
-
     if (metaWindow.clone.first_child.name === 'selection') {
         let selection = metaWindow.clone.first_child;
         let vMax = metaWindow.maximized_vertically;
         let hMax = metaWindow.maximized_horizontally;
-        let protrusion = Math.round(prefs.window_gap/2);
+        let protrusion = Math.round(prefs.window_gap / 2);
         selection.x = hMax ? 0 : - protrusion;
         selection.y = vMax ? 0 : - protrusion;
         selection.set_size(frame.width + (hMax ? 0 : prefs.window_gap),
-                           frame.height + (vMax ? 0 : prefs.window_gap));
+            frame.height + (vMax ? 0 : prefs.window_gap));
     }
 }
 
