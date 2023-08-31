@@ -133,18 +133,6 @@ var LiveAltTab = GObject.registerClass(
         _onDestroy() {
             super._onDestroy();
             Utils.debug('#preview', 'onDestroy', this.was_accepted);
-            Easer.addEase(this.fog, {
-                time: Settings.prefs.animation_time,
-                opacity: 0,
-                onStopped: () => {
-                    this.fog.destroy();
-                    this.fog = null;
-                    // this.space.cloneContainer.remove_effect(this.blur);
-                    this.clone && this.clone.destroy();
-                    this.clone = null;
-                    this.space.moveDone();
-                },
-            });
             let index = this.was_accepted ? this._selectedIndex : 0;
             let to = this._switcherList.windows[index];
             Tiling.focus_handler(to);
@@ -154,6 +142,11 @@ var LiveAltTab = GObject.registerClass(
                 actor.y = this.clone.y;
             }
             actor.set_scale(1, 1);
+            this.fog.destroy();
+            this.fog = null;
+            // this.space.cloneContainer.remove_effect(this.blur);
+            this.clone && this.clone.destroy();
+            this.clone = null;
         }
     });
 
